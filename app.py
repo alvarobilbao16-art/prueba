@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import altair as alt
+import zipfile
 
 st.set_page_config(page_title="Dashboard de ventas", layout="wide")
 
@@ -99,11 +100,16 @@ COLOR_ESTADO = "#17becf"
 COLOR_REF = "#444444"
 
 def cargar_datos():
-    df1 = pd.read_csv("parte_1.csv.zip", compression="zip", parse_dates=["date"])
-    df2 = pd.read_csv("parte_2.csv.zip", compression="zip", parse_dates=["date"])
+    with zipfile.ZipFile("parte_1.csv.zip", "r") as z1:
+        n1 = [n for n in z1.namelist() if n.endswith(".csv") and "__MACOSX" not in n][0]
+        df1 = pd.read_csv(z1.open(n1), parse_dates=["date"])
+
+    with zipfile.ZipFile("parte_2.csv.zip", "r") as z2:
+        n2 = [n for n in z2.namelist() if n.endswith(".csv") and "__MACOSX" not in n][0]
+        df2 = pd.read_csv(z2.open(n2), parse_dates=["date"])
+
     df = pd.concat([df1, df2], ignore_index=True)
     return df
-
 
 df = cargar_datos()
 
